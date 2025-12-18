@@ -55,12 +55,14 @@ Older or newer firmware revisions may:
 ---
 
 ## 🧱 Project structure
+```text
 .
 ├─ index.html
 ├─ desktop.html
 ├─ mobile.html
 ├─ proxy.php
 └─ config.php
+
 
 ---
 
