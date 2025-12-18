@@ -63,7 +63,7 @@ Older or newer firmware revisions may:
 ├─ proxy.php
 └─ config.php
 
-
+```
 ---
 
 ## 🚀 Quick start
