@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniATS Deluxe By Gersiu</title>
+
+<style>
+  :root{
+    --bg-main:#050814;
+    --bg-panel:#101826;
+    --bg-panel-alt:#131c2c;
+    --border-panel:#283047;
+    --accent:#4da3ff;
+    --accent-soft:#243b63;
+    --text-main:#e5e9f5;
+    --text-dim:#9ba4c5;
+    --s-meter-bg:#111827;
+    --s-meter-grad:linear-gradient(90deg,#32d74b,#ffd60a,#ff453a);
+
+    --danger:#ff4444;
+    --danger-soft:rgba(255,68,68,.18);
+  }
+
+  body.theme-red{
+    --bg-main:#09070e; --bg-panel:#19111f; --bg-panel-alt:#231528; --border-panel:#36203f;
+    --accent:#ff4d8d; --accent-soft:#40172a; --text-main:#ffe7f7; --text-dim:#c38cae;
+    --s-meter-grad:linear-gradient(90deg,#ff9f0a,#ff375f,#ff453a);
+    --danger:#ff5566;
+    --danger-soft:rgba(255,85,102,.18);
+  }
+  body.theme-carbon{
+    --bg-main:#030405; --bg-panel:#111; --bg-panel-alt:#171717; --border-panel:#2a2a2a;
+    --accent:#00d4ff; --accent-soft:#003241; --text-main:#f3f3f3; --text-dim:#a0a0a0;
+    --s-meter-grad:linear-gradient(90deg,#00ffcc,#00b7ff,#ff00ff);
+    --danger:#ff4d4d;
+    --danger-soft:rgba(255,77,77,.18);
+  }
+  body.theme-hackrf{
+    --bg-main:#020812; --bg-panel:#05182a; --bg-panel-alt:#071f34; --border-panel:#0c2844;
+    --accent:#00ff9c; --accent-soft:#053626; --text-main:#dffef3; --text-dim:#83c7ac;
+    --s-meter-grad:linear-gradient(90deg,#00ff9c,#00e0ff,#ff77ff);
+    --danger:#ff4d4d;
+    --danger-soft:rgba(255,77,77,.18);
+  }
+  body.theme-websdr{
+    --bg-main:#06060b; --bg-panel:#141426; --bg-panel-alt:#191934; --border-panel:#30305a;
+    --accent:#ffd95a; --accent-soft:#3f3210; --text-main:#fdf7df; --text-dim:#cfbf88;
+    --s-meter-grad:linear-gradient(90deg,#9fff5a,#ffd95a,#ff7461);
+    --danger:#ff5a5a;
+    --danger-soft:rgba(255,90,90,.18);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  body{
+    background:var(--bg-main);
+    color:var(--text-main);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:82px;
+  }
+
+  header{
+    padding:10px 12px;
+    border-bottom:1px solid var(--border-panel);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:.75rem;
+    background:rgba(0,0,0,.15);
+    position:sticky;
+    top:0;
+    z-index:50;
+    backdrop-filter: blur(6px);
+  }
+  header small{color:var(--text-dim);font-size:.82rem;line-height:1.1}
+  header label{color:var(--text-dim);font-size:.78rem}
+  header select{
+    background:#050814;
+    border:1px solid var(--border-panel);
+    color:var(--text-main);
+    border-radius:8px;
+    padding:6px 8px;
+    font-size:.85rem;
+  }
+
+  .wrap{padding:12px;display:flex;flex-direction:column;gap:12px}
+
+  .section{
+    padding:12px;
+    background:var(--bg-panel-alt);
+    border-radius:12px;
+    border:1px solid var(--border-panel);
+  }
+  .section h2{font-size:.95rem;margin-bottom:8px;color:var(--accent)}
+  label{font-size:.8rem;color:var(--text-dim)}
+  select,input[type="range"],input[type="number"],input[type="text"]{
+    width:100%;
+    background:#050814;
+    border:1px solid var(--border-panel);
+    color:var(--text-main);
+    border-radius:10px;
+    padding:10px 10px;
+    margin-top:6px;
+    font-size:1rem;
+  }
+  select:focus,input:focus{outline:none;border-color:var(--accent)}
+
+  /* === highlight rosu pt input invalid === */
+  input.invalid{
+    border-color:var(--danger) !important;
+    background:linear-gradient(0deg,var(--danger-soft),transparent) !important;
+    box-shadow:0 0 0 3px rgba(255,68,68,.12);
+  }
+  .field-hint{
+    font-size:.75rem;
+    color:var(--text-dim);
+    display:block;
+    margin-top:6px;
+    line-height:1.2;
+  }
+  .field-hint.danger{
+    color:var(--danger);
+  }
+
+  .freq-display{text-align:center;margin-bottom:8px}
+  .freq-main{font-size:2.4rem;font-weight:800;letter-spacing:.5px}
+  .freq-unit{font-size:1rem;color:var(--text-dim);margin-left:6px}
+
+  .small-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    font-size:.86rem;
+    color:var(--text-dim);
+    margin-top:6px;
+  }
+
+  .value-chip{
+    background:#050814;
+    border-radius:999px;
+    padding:3px 8px;
+    border:1px solid var(--border-panel);
+    color:var(--text-main);
+    font-size:.74rem;
+    white-space:nowrap;
+    max-width:220px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .value-chip[title]{cursor:help}
+
+  .freq-direct-row{display:flex;gap:8px;margin-top:10px}
+  .freq-direct-row input{flex:1}
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:10px 12px;
+    background:var(--accent-soft);
+    color:var(--text-main);
+    font-size:.95rem;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    white-space:nowrap;
+    user-select:none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn.primary{background:var(--accent);color:#050814;font-weight:700}
+  .btn.danger{background:#ff4444;color:white}
+  .btn:active{transform:translateY(1px);filter:brightness(1.1)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+
+  .smeter{
+    position:relative;height:22px;background:var(--s-meter-bg);
+    border-radius:999px;overflow:hidden;border:1px solid var(--border-panel);margin-top:8px
+  }
+  .smeter-bar{position:absolute;height:100%;width:0%;background:var(--s-meter-grad);transition:width .12s linear}
+  .smeter-scale{display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-dim);margin-top:6px}
+
+  .rds-box{
+    background:#050814;border-radius:10px;border:1px solid var(--border-panel);
+    overflow:hidden;height:40px;display:flex;align-items:center;padding:0 10px;white-space:nowrap
+  }
+  .rds-scroll{display:inline-block;animation:rdsScroll 16s linear infinite}
+  @keyframes rdsScroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+  .preset-row{display:flex;gap:8px;margin-top:10px}
+  .preset-row select{flex:1}
+
+  footer{
+    font-size:.78rem;
+    padding:10px 12px;
+    border-top:1px solid var(--border-panel);
+    text-align:center;
+    color:var(--text-dim);
+    background:rgba(0,0,0,.15);
+  }
+
+  /* ===== BARA MOBIL JOS ===== */
+  #mobileBar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:78px;
+    background:var(--bg-panel);
+    border-top:1px solid var(--border-panel);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:10px 10px 12px;
+    z-index:9999;
+    backdrop-filter: blur(8px);
+  }
+
+  #mbRowTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+
+  .mbBtn{
+    background:var(--accent-soft);
+    color:var(--text-main);
+    border:none;
+    border-radius:14px;
+    width:64px;
+    height:44px;
+    font-size:1.15rem;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color: transparent;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mbBtn.primary{background:var(--accent);color:#050814;font-weight:800}
+  .mbBtn:active{transform:scale(.94);filter:brightness(1.15)}
+
+  #mbVolWrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width:140px;
+  }
+  #mbVolTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:.78rem;
+    color:var(--text-dim);
+  }
+  #mbVolValue{
+    color:var(--text-main);
+    font-weight:700;
+    padding:2px 8px;
+    border:1px solid var(--border-panel);
+    border-radius:999px;
+    background:#050814;
+    font-size:.72rem;
+  }
+  #mbVolume{
+    width:100%;
+    margin:0;
+    padding:0;
+    height:28px;
+    accent-color: var(--accent);
+    background:transparent;
+  }
+
+  #mbRowBottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    font-size:.74rem;
+    color:var(--text-dim);
+    margin-top:-4px;
+    line-height:1.1;
+  }
+  #mbHint{opacity:.85}
+  #mbConn{opacity:.85}
+</style>
+</head>
+
+<body class="theme-blue">
+<header>
+  <div>
+    <small><span data-i18n="header_mobile">· MiniATS Deluxe By Gersiu · (M)</span></small>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <label id="lblTheme" for="themeSelect" data-i18n="theme">Temă</label>
+    <select id="themeSelect">
+      <option value="blue" data-i18n="theme_blue">SDR++ Albastru</option>
+      <option value="red" data-i18n="theme_red">SDR++ Roșu</option>
+      <option value="carbon" data-i18n="theme_carbon">Dark Carbon</option>
+      <option value="hackrf" data-i18n="theme_hackrf">HackRF Neon</option>
+      <option value="websdr" data-i18n="theme_websdr">WebSDR Clasic</option>
+    </select>
+
+    <label id="lblLang" for="langSelect" data-i18n="language">Limbă</label>
+    <select id="langSelect">
+      <option value="ro">Română</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="section">
+    <h2 data-i18n="frequency">Frecvență</h2>
+    <div class="freq-display">
+      <span class="freq-main" id="frequencyDisplay">---</span>
+      <span class="freq-unit" id="frequencyUnit">MHz</span>
+    </div>
+
+    <div class="small-row">
+      <span><span data-i18n="band">Bandă</span>: <span id="bandLabel" class="value-chip" title="">N/A</span></span>
+      <span><span data-i18n="mode">Mod</span>: <span id="modeLabel" class="value-chip" title="">N/A</span></span>
+    </div>
+
+    <div class="freq-direct-row">
+      <!-- tastatura numerica pe mobil + decimal -->
+      <input
+        type="text"
+        id="directFreq"
+        placeholder="Ex: 101.50 (FM) sau 710 (kHz)" data-i18n-placeholder="direct_freq_ph"
+        inputmode="decimal"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        pattern="[0-9]+([.,][0-9]+)?"
+      >
+      <button class="btn primary" id="directFreqSet" data-i18n="set">Set</button>
+    </div>
+
+    <small id="directFreqHint" class="field-hint" data-i18n="direct_freq_hint">
+      FM: MHz (ex: 101.50) · AM/SSB: kHz (ex: 710)
+    </small>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="smeter">S-Meter</h2>
+    <div class="smeter"><div class="smeter-bar" id="smeterBar"></div></div>
+    <div class="smeter-scale"><span>-20</span><span>0</span><span>+20</span><span>+40</span><span>+60</span></div>
+    <div class="small-row">
+      <span>RSSI: <span id="rssiLabel">-- dBµV</span></span>
+      <span>SNR: <span id="snrLabel">-- dB</span></span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="band_step_bw">Bandă / Step / BW</h2>
+    <label data-i18n="band">Bandă</label>
+    <select id="bands"></select>
+
+    <label style="margin-top:10px;" data-i18n="step_from_ats">Step (din ATS)</label>
+    <select id="steps"></select>
+
+    <label style="margin-top:10px;" data-i18n="seek_step">Seek step (kHz)</label>
+    <input type="number" id="customStep" min="0.1" max="500" step="0.1" value="10">
+    <small class="field-hint">
+      <span data-i18n="seek_step_hint">Folosit la Seek (tap/hold). Ex: 1, 5, 10, 50</span>
+    </small>
+
+    <label style="margin-top:10px;" data-i18n="bandwidth">Bandwidth</label>
+    <select id="bandwidths"></select>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="audio_agc">Audio & AGC</h2>
+
+    <label><span data-i18n="volume_ui">Volum (din UI)</span> (<span id="volumeValue">--</span>)</label>
+    <input type="range" id="volume" min="0" max="63" value="0">
+
+    <label style="margin-top:10px;"><span data-i18n="squelch">Squelch</span> (<span id="squelchValue" data-i18n-dynamic="squelchValue">Oprit</span>)</label>
+    <input type="range" id="squelch" min="0" max="127" value="0">
+
+    <label style="margin-top:10px;"><span data-i18n="agc_att">AGC/Att</span> (<span id="agcAttValue" data-i18n-dynamic="agcAttValue">AGC</span>)</label>
+    <input type="range" id="agcAttenuation" min="-1" max="26" value="-1">
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="rds">RDS</h2>
+    <div class="rds-box"><span class="rds-scroll" id="rdsText"><span data-i18n="waiting_rds">Aștept date RDS...</span></span></div>
+    <div class="small-row" style="margin-top:10px;">
+      <span>PI: <span id="piCode">N/A</span></span>
+      <span><span data-i18n="station">Stație</span>: <span id="stationName">N/A</span></span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="info">Info</h2>
+    <div class="small-row">
+      <span>IP: <span id="ipLabel" class="value-chip" title="">-</span></span>
+      <span>FW: <span id="fwLabel" class="value-chip" title="">-</span></span>
+    </div>
+    <div class="small-row" style="margin-top:10px;">
+      <span><span data-i18n="time">Ora</span>: <span id="timeLabel">--:--</span></span>
+      <span><span data-i18n="battery">Baterie</span>: <span id="batteryLabel">-- V</span></span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="memories">Memorii ATS-Mini</h2>
+    <div class="preset-row">
+      <select id="presetList"></select>
+      <button class="btn" id="loadPreset" data-i18n="load">Încărcare</button>
+    </div>
+    <div class="preset-row">
+      <button class="btn" id="savePreset" data-i18n="save_current">Salvează curent</button>
+      <button class="btn danger" id="deletePreset" data-i18n="delete">Șterge</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== BARA FIXĂ JOS ===== -->
+<div id="mobileBar">
+  <div id="mbRowTop">
+    <button class="mbBtn" id="mbTuneDown" title="Tune - (1 kHz)" data-i18n-title="tune_minus">◀</button>
+    <button class="mbBtn" id="mbSeekDown" title="Tap = seek; Hold = scan continuu" data-i18n-title="seek_hold">⏪</button>
+    <button class="mbBtn primary" id="mbMute" title="Mute / Unmute" data-i18n-title="mute_unmute">🔇</button>
+    <button class="mbBtn" id="mbSeekUp" title="Tap = seek; Hold = scan continuu" data-i18n-title="seek_hold">⏩</button>
+    <button class="mbBtn" id="mbTuneUp" title="Tune + (1 kHz)" data-i18n-title="tune_plus">▶</button>
+  </div>
+
+  <div id="mbRowBottom">
+    <div id="mbVolWrap">
+      <div id="mbVolTop">
+        <span data-i18n="volume">Volum</span>
+        <span id="mbVolValue">--</span>
+      </div>
+      <input id="mbVolume" type="range" min="0" max="63" value="0">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;min-width:140px;">
+      <div id="mbHint" data-i18n="mb_hint">Tune ± = 1 kHz · Hold Seek = scan</div>
+      <div id="mbConn">…</div>
+    </div>
+  </div>
+</div>
+<footer>
+    MiniATS Deluxe · <a href="mailto:neurici@gmail.com?subject=Mesaj%20-%20MiniATS%20Deluxe">Cogian Sergiu</a>
+</footer>
+<script>
+/* ====== CONFIG FRONTEND ====== */
+const BASE = window.location.pathname.replace(/[^\/]+$/, '');
+const PROXY_STATUS_URL  = BASE + 'proxy.php?action=status';
+const PROXY_OPTIONS_URL = BASE + 'proxy.php?action=statusOptions';
+const PROXY_UPDATE_URL  = BASE + 'proxy.php?action=update';
+
+// memorii ATS
+const PROXY_MEM_LIST_URL  = BASE + 'proxy.php?action=memoryList';
+const PROXY_MEM_STORE_URL = BASE + 'proxy.php?action=memoryStore&id=';
+const PROXY_MEM_TUNE_URL  = BASE + 'proxy.php?action=memoryTune&id=';
+const PROXY_MEM_CLEAR_URL = BASE + 'proxy.php?action=memoryClear&id=';
+
+/* ====== UI ELEMENTS ====== */
+const freqDisplay   = document.getElementById('frequencyDisplay');
+const freqUnit      = document.getElementById('frequencyUnit');
+const bandLabel     = document.getElementById('bandLabel');
+const modeLabel     = document.getElementById('modeLabel');
+
+const directFreqInput   = document.getElementById('directFreq');
+const directFreqSetBtn  = document.getElementById('directFreqSet');
+const directFreqHint    = document.getElementById('directFreqHint');
+
+const bandsSel   = document.getElementById('bands');
+const stepsSel   = document.getElementById('steps');
+const bwSel      = document.getElementById('bandwidths');
+const customStepInput = document.getElementById('customStep');
+
+const volRange    = document.getElementById('volume');
+const volLabel    = document.getElementById('volumeValue');
+const squelchRange= document.getElementById('squelch');
+const squelchLabel= document.getElementById('squelchValue');
+const agcRange    = document.getElementById('agcAttenuation');
+const agcLabel    = document.getElementById('agcAttValue');
+
+const rdsText     = document.getElementById('rdsText');
+const piCode      = document.getElementById('piCode');
+const stationName = document.getElementById('stationName');
+
+const rssiLabel   = document.getElementById('rssiLabel');
+const snrLabel    = document.getElementById('snrLabel');
+const smeterBar   = document.getElementById('smeterBar');
+
+const ipLabel     = document.getElementById('ipLabel');
+const fwLabel     = document.getElementById('fwLabel');
+const timeLabel   = document.getElementById('timeLabel');
+const batteryLabel= document.getElementById('batteryLabel');
+
+const presetList     = document.getElementById('presetList');
+const savePresetBtn  = document.getElementById('savePreset');
+const deletePresetBtn= document.getElementById('deletePreset');
+const loadPresetBtn  = document.getElementById('loadPreset');
+
+const themeSelect = document.getElementById('themeSelect');
+const langSelect = document.getElementById('langSelect');
+const mbConn = document.getElementById('mbConn');
+
+/* ====== MOBILE BAR ====== */
+const mbTuneUp   = document.getElementById('mbTuneUp');
+const mbTuneDown = document.getElementById('mbTuneDown');
+const mbSeekUp   = document.getElementById('mbSeekUp');
+const mbSeekDown = document.getElementById('mbSeekDown');
+const mbMute     = document.getElementById('mbMute');
+const mbVolume   = document.getElementById('mbVolume');
+const mbVolValue = document.getElementById('mbVolValue');
+
+
+/* ====== I18N (RO/EN) ====== */
+const I18N = {
+  ro: {
+    theme: "Temă",
+    language: "Limbă",
+    header_mobile: "· MiniATS Control ·",
+    header_desktop: "· MiniATS Control ·",
+    theme_blue: "SDR++ Albastru",
+    theme_red: "SDR++ Roșu",
+    theme_carbon: "Dark Carbon",
+    theme_hackrf: "HackRF Neon",
+    theme_websdr: "WebSDR Clasic",
+    frequency: "Frecvență",
+    frequency_tuning: "Frecvență & Tuning",
+    smeter: "S-Meter",
+    smeter_signal: "S-Meter & Semnal",
+    band_step_bw: "Bandă / Step / BW",
+    audio_agc: "Audio & AGC",
+    rds: "RDS",
+    info: "Info",
+    memories: "Memorii ATS-Mini",
+    band: "Bandă",
+    mode: "Mod",
+    set: "Set",
+    load: "Încărcare",
+    save_current: "Salvează curent",
+    delete: "Șterge",
+    step_from_ats: "Step (din ATS)",
+    seek_step: "Seek step (kHz)",
+    seek_step_hint: "Folosit la Seek (tap/hold). Ex: 1, 5, 10, 50",
+    bandwidth: "Bandwidth",
+    volume_ui: "Volum (din UI)",
+    volume: "Volum",
+    squelch: "Squelch",
+    agc_att: "AGC/Att",
+    station: "Stație",
+    time: "Ora",
+    battery: "Baterie",
+    waiting_rds: "Aștept date RDS...",
+    mb_hint: "Tune ± = 1 kHz · Hold Seek = scan",
+    direct_freq_ph: "Ex: 101.50 (FM) sau 710 (kHz)",
+    direct_freq_hint: "FM: MHz (ex: 101.50) · AM/SSB: kHz (ex: 710)",
+    invalid_format: "Format invalid. Folosește doar cifre și un singur separator . sau ,",
+    invalid_out_of_range: "În afara plajei pentru banda curentă: {min} - {max} {unit}",
+    invalid_generic: "Frecvență invalidă.",
+    off: "Oprit",
+    agc_on: "AGC Pornit",
+    no_rds: "Fără date RDS",
+    online: "Online: {ip}",
+    offline: "Offline?",
+    mem_empty: "[gol]",
+    tune_minus: "Tune - (1 kHz)",
+    tune_plus: "Tune + (1 kHz)",
+    seek_hold: "Tap = seek; Hold = scan continuu",
+    mute_unmute: "Mute / Unmute",
+    tune_hint: "Tune ±: pas fix 1 kHz",
+    tune_minus_btn: "◀ Tune −",
+    tune_plus_btn: "Tune + ▶",
+    seek_down: "Seek ↓",
+    seek_up: "Seek ↑"
+  },
+  en: {
+    theme: "Theme",
+    language: "Language",
+    header_mobile: "· MiniATS Control ·",
+    header_desktop: "· MiniATS Control ·",
+    theme_blue: "SDR++ Blue",
+    theme_red: "SDR++ Red",
+    theme_carbon: "Dark Carbon",
+    theme_hackrf: "HackRF Neon",
+    theme_websdr: "WebSDR Classic",
+    frequency: "Frequency",
+    frequency_tuning: "Frequency & Tuning",
+    smeter: "S-Meter",
+    smeter_signal: "S-Meter & Signal",
+    band_step_bw: "Band / Step / BW",
+    audio_agc: "Audio & AGC",
+    rds: "RDS",
+    info: "Info",
+    memories: "ATS-Mini Memories",
+    band: "Band",
+    mode: "Mode",
+    set: "Set",
+    load: "Load",
+    save_current: "Save current",
+    delete: "Delete",
+    step_from_ats: "Step (from ATS)",
+    seek_step: "Seek step (kHz)",
+    seek_step_hint: "Used for Seek (tap/hold). E.g.: 1, 5, 10, 50",
+    bandwidth: "Bandwidth",
+    volume_ui: "Volume (UI)",
+    volume: "Volume",
+    squelch: "Squelch",
+    agc_att: "AGC/Att",
+    station: "Station",
+    time: "Time",
+    battery: "Battery",
+    waiting_rds: "Waiting for RDS data...",
+    mb_hint: "Tune ± = 1 kHz · Hold Seek = scan",
+    direct_freq_ph: "Ex: 101.50 (FM) or 710 (kHz)",
+    direct_freq_hint: "FM: MHz (e.g. 101.50) · AM/SSB: kHz (e.g. 710)",
+    invalid_format: "Invalid format. Use digits and a single decimal separator . or ,",
+    invalid_out_of_range: "Out of range for current band: {min} - {max} {unit}",
+    invalid_generic: "Invalid frequency.",
+    off: "Off",
+    agc_on: "AGC On",
+    no_rds: "No RDS data",
+    online: "Online: {ip}",
+    offline: "Offline?",
+    mem_empty: "[empty]",
+    tune_minus: "Tune - (1 kHz)",
+    tune_plus: "Tune + (1 kHz)",
+    seek_hold: "Tap = seek; Hold = continuous scan",
+    mute_unmute: "Mute / Unmute",
+    tune_hint: "Tune ±: fixed 1 kHz step",
+    tune_minus_btn: "◀ Tune −",
+    tune_plus_btn: "Tune + ▶",
+    seek_down: "Seek ↓",
+    seek_up: "Seek ↑"
+  }
+};
+
+let currentLang = localStorage.getItem('lang') || 'ro';
+
+function t(key, vars){
+  const dict = I18N[currentLang] || I18N.ro;
+  let s = dict[key] ?? I18N.ro[key] ?? key;
+  if (vars){
+    for (const [k,v] of Object.entries(vars)){
+      s = s.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return s;
+}
+
+function applyI18nToDom(){
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+  });
+
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+  });
+}
+
+function setLanguage(lang){
+  currentLang = (lang === 'en') ? 'en' : 'ro';
+  localStorage.setItem('lang', currentLang);
+  if (langSelect) langSelect.value = currentLang;
+  applyI18nToDom();
+  validateDirectFrequencyUI();
+}
+
+if (langSelect){
+  langSelect.addEventListener('change', ()=> setLanguage(langSelect.value));
+}
+
+/* ====== STATE ====== */
+let statusData = null;
+let optionsData = null;
+let pollTimer = null;
+let lastVolumeBeforeMute = null;
+let isSeeking = false;
+let memorySlots = [];
+
+/* ====== FETCH HELPERS ====== */
+async function getJSON(url) {
+  const resp = await fetch(url, { cache: "no-store" });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+async function postJSON(url, obj) {
+  const resp = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(obj)
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  try { return await resp.json(); } catch { return {}; }
+}
+
+/* ====== S-METER ====== */
+function updateSMeter(rssi,snr){
+  const norm = Math.max(-20, Math.min(60, rssi));
+  const pct = ((norm + 20) / 80) * 100;
+  smeterBar.style.width = pct.toFixed(1) + '%';
+  rssiLabel.textContent = `${rssi} dBµV`;
+  snrLabel.textContent  = `${snr} dB`;
+}
+
+/* ====== OPTIONS ====== */
+async function loadOptions(){
+  optionsData = await getJSON(PROXY_OPTIONS_URL);
+
+  bandsSel.innerHTML = '';
+  for (const b of optionsData.bands){
+    const mode = optionsData.modes.find(m => m.id === b.modeIdx)?.mode ?? '';
+    const isFM = (mode === 'FM');
+    const minStr = isFM ? (b.minimumFreq/1e6).toFixed(2)+' MHz' : (b.minimumFreq/1e3).toFixed(0)+' kHz';
+    const maxStr = isFM ? (b.maximumFreq/1e6).toFixed(2)+' MHz' : (b.maximumFreq/1e3).toFixed(0)+' kHz';
+
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = `${b.name} | ${mode} | ${minStr} - ${maxStr}`;
+    bandsSel.appendChild(opt);
+  }
+}
+
+/* ====== MEMORII ATS ====== */
+function formatMemoryLabel(mem, index){
+  const pos = (index + 1).toString().padStart(2,'0');
+  if (!mem || mem.freq === undefined) return `${pos}: ${t('mem_empty')}`;
+
+  const band = optionsData?.bands.find(b => b.id === mem.bandIdx);
+  const modeObj = optionsData?.modes.find(m => m.id === mem.modeIdx);
+  const mode = modeObj?.mode ?? 'FM';
+  const isFM = (mode === 'FM');
+
+  const freqStr = isFM ? (mem.freq/1e6).toFixed(2)+' MHz' : (mem.freq/1e3).toFixed(0)+' kHz';
+  const namePart = mem.name ? mem.name + ' - ' : '';
+  const bandPart = band ? band.name + ' - ' : '';
+
+  return `${pos}: ${namePart}${bandPart}${mode} ${freqStr}`;
+}
+
+async function loadMemoriesFromATS(){
+  if (!optionsData) return;
+
+  try{
+    const list = await getJSON(PROXY_MEM_LIST_URL);
+    memorySlots = Array.isArray(list) ? list : [];
+  } catch {
+    memorySlots = [];
+  }
+
+  presetList.innerHTML = '';
+  memorySlots.forEach((mem, idx) => {
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = formatMemoryLabel(mem, idx);
+    opt.dataset.slotIndex = idx;
+    if (mem && mem.id !== undefined) opt.dataset.id = mem.id;
+    presetList.appendChild(opt);
+  });
+}
+
+savePresetBtn.addEventListener('click', async () => {
+  const opt = presetList.selectedOptions[0];
+  if (!opt) return;
+
+  const slotIndex = parseInt(opt.dataset.slotIndex || opt.value, 10);
+  if (isNaN(slotIndex)) return;
+
+  try{
+    await postJSON(PROXY_MEM_STORE_URL + slotIndex, {});
+    await loadMemoriesFromATS();
+  } catch {}
+});
+
+deletePresetBtn.addEventListener('click', async () => {
+  const opt = presetList.selectedOptions[0];
+  if (!opt) return;
+
+  const id = parseInt(opt.dataset.id ?? opt.dataset.slotIndex ?? opt.value, 10);
+  if (isNaN(id)) return;
+
+  try{
+    await fetch(PROXY_MEM_CLEAR_URL + id, { method:'DELETE' });
+    await loadMemoriesFromATS();
+  } catch {}
+});
+
+loadPresetBtn.addEventListener('click', async () => {
+  const opt = presetList.selectedOptions[0];
+  if (!opt) return;
+
+  const id = parseInt(opt.dataset.id ?? opt.dataset.slotIndex ?? opt.value, 10);
+  if (isNaN(id)) return;
+
+  try{
+    await postJSON(PROXY_MEM_TUNE_URL + id, {});
+  } catch {}
+});
+
+/* ====== STATUS -> UI ====== */
+function applyStatus(s){
+  statusData = s;
+
+  const mode = optionsData?.modes.find(m => m.id === s.modeIdx)?.mode ?? 'FM';
+  const isFM = mode === 'FM';
+  const freqHz = s.freq;
+
+  let mainStr, unit;
+  if (isFM){ mainStr = (freqHz/1e6).toFixed(2); unit='MHz'; }
+  else { mainStr = (freqHz/1e3).toFixed(0); unit='kHz'; }
+
+  freqDisplay.textContent = mainStr;
+  freqUnit.textContent = unit;
+
+  const bandObj = optionsData?.bands.find(b => b.id === s.bandIdx);
+  bandLabel.textContent = bandObj?.name ?? 'N/A';
+  bandLabel.title = bandLabel.textContent;
+
+  modeLabel.textContent = mode;
+  modeLabel.title = modeLabel.textContent;
+
+  if (bandsSel && bandObj) bandsSel.value = String(bandObj.id);
+
+  // steps
+  if (stepsSel && optionsData){
+    const stepList = (mode === 'FM') ? optionsData.steps.fm : (mode === 'AM') ? optionsData.steps.am : optionsData.steps.ssb;
+    stepsSel.innerHTML = '';
+    for (const st of stepList){
+      const opt = document.createElement('option');
+      opt.value = st.id;
+      opt.textContent = st.desc;
+      stepsSel.appendChild(opt);
+    }
+    stepsSel.value = String(s.stepIdx);
+  }
+
+  // bandwidth
+  if (bwSel && optionsData){
+    const bwList = (mode === 'FM') ? optionsData.bandwidths.fm : (mode === 'AM') ? optionsData.bandwidths.am : optionsData.bandwidths.ssb;
+    bwSel.innerHTML = '';
+    for (const bw of bwList){
+      const opt = document.createElement('option');
+      opt.value = bw.id;
+      opt.textContent = bw.desc;
+      bwSel.appendChild(opt);
+    }
+    bwSel.value = String(s.bandwidthIdx);
+  }
+
+  // volume (sync UI + bottom slider)
+  volRange.value = String(s.volume);
+  volLabel.textContent = String(s.volume).padStart(2,'0');
+  mbVolume.value = String(s.volume);
+  mbVolValue.textContent = String(s.volume).padStart(2,'0');
+
+  // squelch
+  squelchRange.value = String(s.squelch);
+  squelchLabel.textContent = s.squelch ? `${s.squelch} dBµV` : t('off');
+
+  // agc/att
+  if (s.agc){
+    agcRange.value = '-1';
+    agcLabel.textContent = t('agc_on');
+  } else {
+    const att = s.attenuation ?? 0;
+    agcRange.value = String(att);
+    agcLabel.textContent = String(att).padStart(2,'0') + ' dB';
+  }
+
+  // RDS
+  piCode.textContent = s.rds?.piCode ?? 'N/A';
+  stationName.textContent = s.rds?.stationName ?? 'N/A';
+  const rt = s.rds?.radioText || s.rds?.programInfo || t('no_rds');
+  if (rt !== rdsText.textContent){
+    rdsText.textContent = rt;
+    rdsText.style.animation = 'none';
+    void rdsText.offsetWidth;
+    rdsText.style.animation = 'rdsScroll 16s linear infinite';
+  }
+
+  updateSMeter(s.rssi, s.snr);
+
+  // info
+  ipLabel.textContent = s.ip ?? '-';
+  ipLabel.title = ipLabel.textContent;
+
+  fwLabel.textContent = s.version ?? '-';
+  fwLabel.title = fwLabel.textContent;
+
+  timeLabel.textContent = s.time ?? '--:--';
+  batteryLabel.textContent = s.battery ? s.battery.toFixed(2)+' V' : '-- V';
+
+  // conn hint
+  mbConn.textContent = (s.ip ? t('online',{ip:s.ip}) : t('offline'));
+
+  // refresh validare input frecventa (ca sa tina cont de modul curent)
+  validateDirectFrequencyUI();
+}
+
+/* ====== POLLING ====== */
+async function pollStatus(){
+  try{
+    const s = await getJSON(PROXY_STATUS_URL);
+    applyStatus(s);
+  } catch {
+    // silent retry
+  } finally {
+    pollTimer = setTimeout(pollStatus, 1000);
+  }
+}
+
+/* ====== UPDATE STATUS ====== */
+function updateStatus(partial){
+  if (!statusData) return;
+  return postJSON(PROXY_UPDATE_URL, { ...partial }).catch(()=>{});
+}
+
+/* ====== CONTROALE UI ====== */
+bandsSel.addEventListener('change', () => updateStatus({ bandIdx: parseInt(bandsSel.value,10) }));
+stepsSel.addEventListener('change', () => updateStatus({ stepIdx: parseInt(stepsSel.value,10) }));
+bwSel.addEventListener('change', () => updateStatus({ bandwidthIdx: parseInt(bwSel.value,10) }));
+
+let volDebounce;
+function setVolume(v){
+  v = Math.max(0, Math.min(63, v|0));
+  volRange.value = String(v);
+  volLabel.textContent = String(v).padStart(2,'0');
+  mbVolume.value = String(v);
+  mbVolValue.textContent = String(v).padStart(2,'0');
+
+  if (volDebounce) clearTimeout(volDebounce);
+  volDebounce = setTimeout(() => updateStatus({ volume:v }), 120);
+}
+volRange.addEventListener('input', () => setVolume(parseInt(volRange.value,10)));
+mbVolume.addEventListener('input', () => setVolume(parseInt(mbVolume.value,10)));
+
+let sqDebounce;
+squelchRange.addEventListener('input', () => {
+  const v = parseInt(squelchRange.value,10);
+  squelchLabel.textContent = v ? `${v} dBµV` : t('off');
+  if (sqDebounce) clearTimeout(sqDebounce);
+  sqDebounce = setTimeout(() => updateStatus({ squelch:v }), 150);
+});
+
+let agcDebounce;
+agcRange.addEventListener('input', () => {
+  const v = parseInt(agcRange.value,10);
+  agcLabel.textContent = (v === -1) ? t('agc_on') : String(v).padStart(2,'0')+' dB';
+  if (agcDebounce) clearTimeout(agcDebounce);
+  agcDebounce = setTimeout(() => {
+    if (v === -1) updateStatus({ agc:true });
+    else updateStatus({ attenuation:v, agc:false });
+  }, 160);
+});
+
+/* ====== FRECVENȚĂ DIRECTĂ (numeric-only + highlight rosu) ====== */
+
+// sanitize: doar cifre + un singur separator . sau ,
+function sanitizeDirectFreq(){
+  let v = directFreqInput.value || '';
+
+  // scoate orice nu e cifra, . sau ,
+  v = v.replace(/[^0-9.,]/g, '');
+
+  // pastreaza un singur separator
+  const parts = v.split(/[.,]/);
+  if (parts.length > 2){
+    v = parts[0] + '.' + parts.slice(1).join('');
+  }
+
+  // nu lasa sa inceapa cu separator
+  v = v.replace(/^[.,]+/, '');
+
+  directFreqInput.value = v;
+}
+
+// range realist in functie de modul curent + banda curenta
+function getAllowedRangeForCurrent(){
+  // daca avem banda curenta (din options) e cel mai corect
+  if (statusData && optionsData){
+    const band = optionsData.bands.find(b => b.id === statusData.bandIdx);
+    const mode = optionsData.modes.find(m => m.id === statusData.modeIdx)?.mode ?? 'FM';
+    if (band){
+      if (mode === 'FM'){
+        return { mode, min: band.minimumFreq/1e6, max: band.maximumFreq/1e6, unit:'MHz' };
+      }
+      return { mode, min: band.minimumFreq/1e3, max: band.maximumFreq/1e3, unit:'kHz' };
+    }
+    // fallback generic daca nu gasim banda
+    if (mode === 'FM') return { mode, min: 50, max: 120, unit:'MHz' };
+    return { mode, min: 100, max: 30000, unit:'kHz' };
+  }
+
+  // fara status: acceptam orice numar pozitiv
+  return { mode: null, min: 0, max: Infinity, unit:'' };
+}
+
+function parseDirectFreqValue(){
+  let raw = (directFreqInput.value || '').trim();
+  if (!raw) return { ok:false };
+
+  raw = raw.replace(',', '.');
+
+  // valid final format (numar sau numar.zecimale)
+  if (!/^\d+(\.\d+)?$/.test(raw)) return { ok:false };
+
+  const val = parseFloat(raw);
+  if (!isFinite(val) || val <= 0) return { ok:false };
+
+  return { ok:true, value: val };
+}
+
+function setDirectFreqInvalid(isInvalid, msg){
+  if (isInvalid){
+    directFreqInput.classList.add('invalid');
+    directFreqHint.classList.add('danger');
+    directFreqHint.textContent = msg || t('invalid_generic');
+    directFreqSetBtn.disabled = true;
+  } else {
+    directFreqInput.classList.remove('invalid');
+    directFreqHint.classList.remove('danger');
+    directFreqHint.textContent = t('direct_freq_hint');
+    directFreqSetBtn.disabled = false;
+  }
+}
+
+function validateDirectFrequencyUI(){
+  // daca e gol -> nu stresam userul
+  if (!directFreqInput.value.trim()){
+    setDirectFreqInvalid(false);
+    return true;
+  }
+
+  const parsed = parseDirectFreqValue();
+  if (!parsed.ok){
+    setDirectFreqInvalid(true, t('invalid_format'));
+    return false;
+  }
+
+  const rng = getAllowedRangeForCurrent();
+  // daca nu stim modul/banda, doar format
+  if (!rng.mode){
+    setDirectFreqInvalid(false);
+    return true;
+  }
+
+  // verifica in plaja
+  if (parsed.value < rng.min || parsed.value > rng.max){
+    setDirectFreqInvalid(true, t('invalid_out_of_range',{min:rng.min.toFixed(rng.unit==='MHz'?2:0),max:rng.max.toFixed(rng.unit==='MHz'?2:0),unit:rng.unit}));
+    return false;
+  }
+
+  setDirectFreqInvalid(false);
+  return true;
+}
+
+// input realtime + paste safe
+directFreqInput.addEventListener('input', () => {
+  sanitizeDirectFreq();
+  validateDirectFrequencyUI();
+});
+
+// pe blur (cand iese din input) validam din nou
+directFreqInput.addEventListener('blur', () => {
+  sanitizeDirectFreq();
+  validateDirectFrequencyUI();
+});
+
+function setDirectFrequency(){
+  if (!statusData || !optionsData) return;
+
+  // daca nu e valid, nu setam
+  if (!validateDirectFrequencyUI()) return;
+
+  const parsed = parseDirectFreqValue();
+  if (!parsed.ok) return;
+
+  const rng = getAllowedRangeForCurrent();
+  const mode = rng.mode ?? (optionsData.modes.find(m=>m.id===statusData.modeIdx)?.mode ?? 'FM');
+
+  let freqHz;
+  if (mode === 'FM'){
+    freqHz = Math.round(parsed.value * 1e6);
+  } else {
+    freqHz = Math.round(parsed.value * 1e3);
+  }
+
+  updateStatus({ freq: freqHz });
+}
+
+directFreqSetBtn.addEventListener('click', setDirectFrequency);
+directFreqInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') setDirectFrequency();
+});
+
+/* ====== TUNE: 1 kHz FIX ====== */
+function tuneStep(direction){
+  if (!statusData) return;
+  const stepHz = 1000;
+  const newFreq = statusData.freq + (direction > 0 ? stepHz : -stepHz);
+  updateStatus({ freq:newFreq });
+}
+
+/* ====== MUTE ====== */
+function toggleMute(){
+  if (!statusData) return;
+  if (lastVolumeBeforeMute === null && statusData.volume > 0){
+    lastVolumeBeforeMute = statusData.volume;
+    setVolume(0);
+    mbMute.textContent = '🔊';
+  } else {
+    const restore = lastVolumeBeforeMute ?? 20;
+    lastVolumeBeforeMute = null;
+    setVolume(restore);
+    mbMute.textContent = '🔇';
+  }
+}
+
+/* ====== SEEK ====== */
+function getSeekStepHz(mode){
+  let v = parseFloat((customStepInput?.value ?? '10').toString().replace(',', '.'));
+  if (isNaN(v) || v <= 0) v = (mode === 'FM') ? 100 : 5;
+  return v * 1000;
+}
+
+// seek inteligent (tap)
+async function seekSmart(direction){
+  if (!statusData || !optionsData || isSeeking) return;
+  isSeeking = true;
+
+  try{
+    let freq = statusData.freq;
+    const mode = optionsData.modes.find(m=>m.id===statusData.modeIdx)?.mode ?? 'FM';
+    const stepHz = getSeekStepHz(mode);
+    const band = optionsData.bands.find(b=>b.id===statusData.bandIdx);
+    const minF = band.minimumFreq;
+    const maxF = band.maximumFreq;
+
+    for (let i=0;i<200;i++){
+      freq += stepHz * (direction > 0 ? 1 : -1);
+      if (freq < minF) freq = maxF;
+      if (freq > maxF) freq = minF;
+
+      await updateStatus({ freq });
+      await new Promise(r => setTimeout(r, 220));
+
+      const s = await getJSON(PROXY_STATUS_URL);
+      if (s.rssi >= 10) break;
+    }
+  } catch {
+  } finally {
+    isSeeking = false;
+  }
+}
+
+// seek continuu (hold)
+function seekStepOnce(direction){
+  if (!statusData || !optionsData) return;
+
+  const mode = optionsData.modes.find(m=>m.id===statusData.modeIdx)?.mode ?? 'FM';
+  const stepHz = getSeekStepHz(mode);
+  const band = optionsData.bands.find(b=>b.id===statusData.bandIdx);
+  if (!band) return;
+
+  let freq = statusData.freq + stepHz * (direction > 0 ? 1 : -1);
+  if (freq < band.minimumFreq) freq = band.maximumFreq;
+  if (freq > band.maximumFreq) freq = band.minimumFreq;
+
+  updateStatus({ freq });
+}
+
+/* ====== LONG PRESS HANDLERS (Pointer Events) ====== */
+function addHoldRepeat(btn, onTap, onHoldTick){
+  let holdTimer = null;
+  let tickTimer = null;
+  let holding = false;
+  const HOLD_DELAY = 280;
+  const TICK_MS = 220;
+
+  const clearAll = () => {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer=null; }
+    if (tickTimer) { clearInterval(tickTimer); tickTimer=null; }
+    holding = false;
+  };
+
+  btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    clearAll();
+
+    holdTimer = setTimeout(() => {
+      holding = true;
+      onHoldTick();
+      tickTimer = setInterval(onHoldTick, TICK_MS);
+    }, HOLD_DELAY);
+  });
+
+  btn.addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    if (!holding) onTap();
+    clearAll();
+  });
+
+  btn.addEventListener('pointercancel', clearAll);
+  btn.addEventListener('pointerleave', () => {
+    if (holding) clearAll();
+  });
+}
+
+/* ====== MOBILE BAR BINDINGS ====== */
+mbTuneUp.addEventListener('click', () => tuneStep(+1));
+mbTuneDown.addEventListener('click', () => tuneStep(-1));
+mbMute.addEventListener('click', toggleMute);
+
+// Seek: tap = smart, hold = continuu
+addHoldRepeat(mbSeekUp,   () => seekSmart(+1), () => seekStepOnce(+1));
+addHoldRepeat(mbSeekDown, () => seekSmart(-1), () => seekStepOnce(-1));
+
+/* ====== THEME ====== */
+function applyTheme(name){
+  document.body.className = '';
+  switch(name){
+    case 'red': document.body.classList.add('theme-red'); break;
+    case 'carbon': document.body.classList.add('theme-carbon'); break;
+    case 'hackrf': document.body.classList.add('theme-hackrf'); break;
+    case 'websdr': document.body.classList.add('theme-websdr'); break;
+    default: document.body.className = '';
+  }
+}
+themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+applyTheme('blue');
+
+/* ====== SHORTCUTS ====== */
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') tuneStep(+1);
+  if (e.key === 'ArrowLeft')  tuneStep(-1);
+  if (e.key === 'ArrowUp')    seekSmart(+1);
+  if (e.key === 'ArrowDown')  seekSmart(-1);
+  if (e.key === 'm' || e.key === 'M') toggleMute();
+});
+
+/* ====== STARTUP ====== */
+(async function init(){
+  setLanguage(currentLang);
+  try { await loadOptions(); } catch {}
+  await loadMemoriesFromATS();
+  setInterval(loadMemoriesFromATS, 5000);
+  pollStatus();
+
+  // initial validare UI
+  validateDirectFrequencyUI();
+})();
+</script>
+
+</body>
+</html>

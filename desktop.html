@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniATS Deluxe By Gersiu</title>
+
+<style>
+    :root {
+        --bg-main: #050814;
+        --bg-panel: #101826;
+        --bg-panel-alt: #131c2c;
+        --border-panel: #283047;
+        --accent: #4da3ff;
+        --accent-soft: #243b63;
+        --text-main: #e5e9f5;
+        --text-dim: #9ba4c5;
+        --s-meter-bg: #111827;
+        --s-meter-grad: linear-gradient(90deg,#32d74b,#ffd60a,#ff453a);
+        --waterfall-top: #0b1020;
+
+        /* validare */
+        --danger:#ff4444;
+        --danger-soft:rgba(255,68,68,.18);
+    }
+
+    body.theme-red {
+        --bg-main: #09070e;
+        --bg-panel: #19111f;
+        --bg-panel-alt: #231528;
+        --border-panel: #36203f;
+        --accent: #ff4d8d;
+        --accent-soft: #40172a;
+        --text-main: #ffe7f7;
+        --text-dim: #c38cae;
+        --s-meter-grad: linear-gradient(90deg,#ff9f0a,#ff375f,#ff453a);
+        --waterfall-top:#130712;
+
+        --danger:#ff5566;
+        --danger-soft:rgba(255,85,102,.18);
+    }
+
+    body.theme-carbon {
+        --bg-main: #030405;
+        --bg-panel: #111111;
+        --bg-panel-alt: #171717;
+        --border-panel: #2a2a2a;
+        --accent: #00d4ff;
+        --accent-soft: #003241;
+        --text-main: #f3f3f3;
+        --text-dim: #a0a0a0;
+        --s-meter-grad: linear-gradient(90deg,#00ffcc,#00b7ff,#ff00ff);
+        --waterfall-top:#050509;
+
+        --danger:#ff4d4d;
+        --danger-soft:rgba(255,77,77,.18);
+    }
+
+    body.theme-hackrf {
+        --bg-main:#020812;
+        --bg-panel:#05182a;
+        --bg-panel-alt:#071f34;
+        --border-panel:#0c2844;
+        --accent:#00ff9c;
+        --accent-soft:#053626;
+        --text-main:#dffef3;
+        --text-dim:#83c7ac;
+        --s-meter-grad:linear-gradient(90deg,#00ff9c,#00e0ff,#ff77ff);
+        --waterfall-top:#020812;
+
+        --danger:#ff4d4d;
+        --danger-soft:rgba(255,77,77,.18);
+    }
+
+    body.theme-websdr {
+        --bg-main:#06060b;
+        --bg-panel:#141426;
+        --bg-panel-alt:#191934;
+        --border-panel:#30305a;
+        --accent:#ffd95a;
+        --accent-soft:#3f3210;
+        --text-main:#fdf7df;
+        --text-dim:#cfbf88;
+        --s-meter-grad:linear-gradient(90deg,#9fff5a,#ffd95a,#ff7461);
+        --waterfall-top:#06060b;
+
+        --danger:#ff5a5a;
+        --danger-soft:rgba(255,90,90,.18);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    body {
+        background: var(--bg-main);
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--border-panel);
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:1rem;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+        color: var(--accent);
+    }
+
+    header small {
+        color: var(--text-dim);
+        font-size: 0.8rem;
+    }
+
+    .layout {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 0;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        background: var(--bg-panel);
+        border-right:1px solid var(--border-panel);
+        padding:12px;
+        overflow-y:auto;
+    }
+
+    .section {
+        margin-bottom: 14px;
+        padding: 10px;
+        background: var(--bg-panel-alt);
+        border-radius:10px;
+        border:1px solid var(--border-panel);
+    }
+
+    .section h2 {
+        font-size: 0.95rem;
+        margin-bottom:6px;
+        color: var(--accent);
+    }
+
+    label {
+        font-size:0.8rem;
+        color: var(--text-dim);
+    }
+
+    select, input[type="range"], input[type="number"], input[type="text"] {
+        width: 100%;
+        background: #050814;
+        border:1px solid var(--border-panel);
+        color:var(--text-main);
+        border-radius:6px;
+        padding:6px;
+        margin-top:4px;
+        font-size:0.85rem;
+    }
+
+    select:focus, input:focus {
+        outline:none;
+        border-color: var(--accent);
+    }
+
+    /* === highlight rosu pt input invalid === */
+    input.invalid{
+        border-color:var(--danger) !important;
+        background:linear-gradient(0deg,var(--danger-soft),transparent) !important;
+        box-shadow:0 0 0 3px rgba(255,68,68,.12);
+    }
+    .field-hint{
+        font-size:0.7rem;
+        color:var(--text-dim);
+        display:block;
+        margin-top:3px;
+        line-height:1.2;
+    }
+    .field-hint.danger{ color:var(--danger); }
+
+    .freq-display {
+        text-align:center;
+        margin-bottom:6px;
+    }
+
+    .freq-main {
+        font-size:2.2rem;
+        font-weight:700;
+    }
+
+    .freq-unit {
+        font-size:0.9rem;
+        color:var(--text-dim);
+        margin-left:4px;
+    }
+
+    .freq-direct-row {
+        display:flex;
+        gap:6px;
+        margin-top:6px;
+    }
+
+    .freq-direct-row input {
+        flex:1;
+    }
+
+    .big-buttons {
+        display:flex;
+        gap:8px;
+        margin-top:6px;
+    }
+
+    .btn {
+        border:none;
+        border-radius:6px;
+        padding:6px 10px;
+        background: var(--accent-soft);
+        color: var(--text-main);
+        font-size:0.85rem;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:4px;
+        white-space:nowrap;
+    }
+
+    .btn.primary { background: var(--accent); color:#050814; }
+    .btn.danger  { background:#ff4444; color:white; }
+    .btn.small   { padding:4px 8px; font-size:0.75rem; }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
+
+    .btn:hover {
+        filter:brightness(1.1);
+    }
+
+    .btn:active {
+        transform:translateY(1px);
+    }
+
+    .smeter {
+        position:relative;
+        height:22px;
+        background: var(--s-meter-bg);
+        border-radius:999px;
+        overflow:hidden;
+        border:1px solid var(--border-panel);
+        margin-top:6px;
+    }
+
+    .smeter-bar {
+        position:absolute;
+        height:100%;
+        width:0%;
+        background: var(--s-meter-grad);
+        transition:width 0.12s linear;
+    }
+
+    .smeter-scale {
+        display:flex;
+        justify-content:space-between;
+        font-size:0.7rem;
+        color:var(--text-dim);
+        margin-top:3px;
+    }
+
+   .small-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 3px;
+}
+
+.value-chip {
+    background: #050814;
+    border-radius: 999px;
+    padding: 2px 7px;
+    border: 1px solid var(--border-panel);
+    color: var(--text-main);
+    font-size: 0.69rem;
+
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+    .rds-box {
+        background:#050814;
+        border-radius:8px;
+        border:1px solid var(--border-panel);
+        overflow:hidden;
+        height:34px;
+        display:flex;
+        align-items:center;
+        padding:0 6px;
+        white-space:nowrap;
+    }
+
+    .rds-scroll {
+        display:inline-block;
+        animation:rdsScroll 16s linear infinite;
+    }
+
+    @keyframes rdsScroll {
+        0% { transform:translateX(100%); }
+        100% { transform:translateX(-100%); }
+    }
+
+    .preset-row {
+        display:flex;
+        gap:6px;
+        margin-top:6px;
+    }
+
+    .preset-row select {
+        flex:1;
+    }
+
+    .main {
+        position:relative;
+        background:var(--waterfall-top);
+    }
+
+    #waterfall {
+        width:100%;
+        height:100%;
+        display:block;
+        background:black;
+    }
+
+    footer {
+        font-size:0.75rem;
+        padding:4px 10px;
+        border-top:1px solid var(--border-panel);
+        text-align:right;
+        color:var(--text-dim);
+    }
+</style>
+</head>
+
+<body class="theme-blue">
+<header>
+    <div>
+        <small><span data-i18n="header_desktop">· MiniATS Deluxe By Gersiu · (D)·</span></small>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <label id="lblTheme" for="themeSelect" data-i18n="theme">Temă</label>
+        <select id="themeSelect">
+            <option value="blue" data-i18n="theme_blue">SDR++ Albastru</option>
+            <option value="red" data-i18n="theme_red">SDR++ Roșu</option>
+            <option value="carbon" data-i18n="theme_carbon">Dark Carbon</option>
+            <option value="hackrf" data-i18n="theme_hackrf">HackRF Neon</option>
+            <option value="websdr" data-i18n="theme_websdr">WebSDR Clasic</option>
+        </select>
+
+        <label id="lblLang" for="langSelect" data-i18n="language">Limbă</label>
+        <select id="langSelect">
+            <option value="ro">Română</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+</header>
+
+<div class="layout">
+    <div class="sidebar">
+        <!-- Frecvență / Tuning -->
+        <div class="section">
+            <h2 data-i18n="frequency_tuning">Frecvență & Tuning</h2>
+            <div class="freq-display">
+                <span class="freq-main" id="frequencyDisplay">---</span>
+                <span class="freq-unit" id="frequencyUnit">MHz</span>
+            </div>
+            <div class="small-row">
+                <span><span data-i18n="band">Bandă</span>: <span id="bandLabel" class="value-chip">N/A</span></span>
+                <span><span data-i18n="mode">Mod</span>: <span id="modeLabel" class="value-chip">N/A</span></span>
+            </div>
+
+            <!-- Introducere directă frecvență -->
+            <div class="freq-direct-row">
+                <input
+                  type="text"
+                  id="directFreq"
+                  placeholder="Ex: 101.50 (FM) sau 710 kHz" data-i18n-placeholder="direct_freq_ph"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  pattern="[0-9]+([.,][0-9]+)?"
+                >
+                <button class="btn small primary" id="directFreqSet" data-i18n="set">Set</button>
+            </div>
+
+            <small id="directFreqHint" class="field-hint" data-i18n="direct_freq_hint">
+                FM: MHz (ex: 101.50) · AM/SSB: kHz (ex: 710)
+            </small>
+
+            <div class="big-buttons">
+                <button class="btn" id="tuneDown"><span data-i18n="tune_minus_btn">◀ Tune −</span></button>
+                <button class="btn" id="tuneUp"><span data-i18n="tune_plus_btn">Tune + ▶</span></button>
+            </div>
+
+            <div class="big-buttons">
+                <button class="btn small" id="seekDown"><span data-i18n="seek_down">Seek ↓</span></button>
+                <button class="btn small" id="seekUp"><span data-i18n="seek_up">Seek ↑</span></button>
+                <button class="btn small" id="muteBtn">🔇</button>
+            </div>
+            <small class="field-hint">
+                <span data-i18n="tune_hint">Tune ±: pas fix 1 kHz</span>
+            </small>
+        </div>
+
+        <!-- S-meter -->
+        <div class="section">
+            <h2 data-i18n="smeter_signal">S-Meter & Semnal</h2>
+            <div class="smeter">
+                <div class="smeter-bar" id="smeterBar"></div>
+            </div>
+            <div class="smeter-scale">
+                <span>-20</span><span>0</span><span>+20</span><span>+40</span><span>+60</span>
+            </div>
+            <div class="small-row">
+                <span>RSSI: <span id="rssiLabel">-- dBµV</span></span>
+                <span>SNR: <span id="snrLabel">-- dB</span></span>
+            </div>
+        </div>
+
+        <!-- Band / Step / BW -->
+        <div class="section">
+            <h2 data-i18n="band_step_bw">Bandă / Pas / BW</h2>
+            <label data-i18n="band">Bandă</label>
+            <select id="bands"></select>
+
+            <label style="margin-top:6px;" data-i18n="step_from_ats">Step (din ATS)</label>
+            <select id="steps"></select>
+
+            <label style="margin-top:6px;" data-i18n="seek_step">Seek step (kHz)</label>
+            <input type="number" id="customStep" min="0.1" max="500" step="0.1" value="10">
+            <small class="field-hint">
+                <span data-i18n="seek_step_hint">Folosit de Seek ± (ex: 1, 5, 10, 50)</span>
+            </small>
+
+            <label style="margin-top:6px;" data-i18n="bandwidth">Bandwidth</label>
+            <select id="bandwidths"></select>
+        </div>
+
+        <!-- Audio -->
+        <div class="section">
+            <h2 data-i18n="audio_agc">Audio & AGC</h2>
+            <label><span data-i18n="volume">Volum</span> (<span id="volumeValue">--</span>)</label>
+            <input type="range" id="volume" min="0" max="63" value="0">
+
+            <label style="margin-top:6px;"><span data-i18n="squelch">Squelch</span> (<span id="squelchValue" data-i18n-dynamic="squelchValue">Oprit</span>)</label>
+            <input type="range" id="squelch" min="0" max="127" value="0">
+
+            <label style="margin-top:6px;"><span data-i18n="agc_att">AGC/Att</span> (<span id="agcAttValue" data-i18n-dynamic="agcAttValue">AGC</span>)</label>
+            <input type="range" id="agcAttenuation" min="-1" max="26" value="-1">
+        </div>
+
+        <!-- RDS -->
+        <div class="section">
+            <h2 data-i18n="rds">RDS</h2>
+            <div class="rds-box">
+                <span class="rds-scroll" id="rdsText"><span data-i18n="waiting_rds">Aștept date RDS...</span></span>
+            </div>
+            <div class="small-row" style="margin-top:4px;">
+                <span>PI: <span id="piCode">N/A</span></span>
+                <span><span data-i18n="station">Stație</span>: <span id="stationName">N/A</span></span>
+            </div>
+        </div>
+
+        <!-- Baterie & Info -->
+        <div class="section">
+            <h2 data-i18n="info">Info</h2>
+            <div class="small-row">
+                <span>IP: <span id="ipLabel" class="value-chip">-</span></span>
+                <span>FW: <span id="fwLabel" class="value-chip">-</span></span>
+            </div>
+            <div class="small-row" style="margin-top:4px;">
+                <span><span data-i18n="time">Ora</span>: <span id="timeLabel">--:--</span></span>
+                <span><span data-i18n="battery">Baterie</span>: <span id="batteryLabel">-- V</span></span>
+            </div>
+        </div>
+
+        <!-- Preseturi / Memorii -->
+        <div class="section">
+            <h2 data-i18n="memories">Memorii ATS-Mini</h2>
+            <div class="preset-row">
+                <select id="presetList"></select>
+                <button class="btn small" id="loadPreset" data-i18n="load">Încărcare</button>
+            </div>
+            <div class="preset-row">
+                <button class="btn small" id="savePreset" data-i18n="save_current">Salvează curent</button>
+                <button class="btn small danger" id="deletePreset" data-i18n="delete">Șterge</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="main">
+        <canvas id="waterfall"></canvas>
+    </div>
+</div>
+
+<footer>
+    MiniATS Deluxe · <a href="mailto:neurici@gmail.com?subject=Mesaj%20-%20MiniATS%20Deluxe">Cogian Sergiu</a>
+</footer>
+
+<script>
+/* ====== CONFIG FRONTEND ====== */
+const BASE = window.location.pathname.replace(/[^\/]+$/, '');
+const PROXY_STATUS_URL  = BASE + 'proxy.php?action=status';
+const PROXY_OPTIONS_URL = BASE + 'proxy.php?action=statusOptions';
+const PROXY_UPDATE_URL  = BASE + 'proxy.php?action=update';
+
+// memorii ATS
+const PROXY_MEM_LIST_URL  = BASE + 'proxy.php?action=memoryList';
+const PROXY_MEM_STORE_URL = BASE + 'proxy.php?action=memoryStore&id=';
+const PROXY_MEM_TUNE_URL  = BASE + 'proxy.php?action=memoryTune&id=';
+const PROXY_MEM_CLEAR_URL = BASE + 'proxy.php?action=memoryClear&id=';
+
+/* ====== UI ELEMENTS ====== */
+const freqDisplay = document.getElementById('frequencyDisplay');
+const freqUnit = document.getElementById('frequencyUnit');
+const bandLabel = document.getElementById('bandLabel');
+const modeLabel = document.getElementById('modeLabel');
+
+const tuneUpBtn = document.getElementById('tuneUp');
+const tuneDownBtn = document.getElementById('tuneDown');
+const seekUpBtn = document.getElementById('seekUp');
+const seekDownBtn = document.getElementById('seekDown');
+const muteBtn = document.getElementById('muteBtn');
+
+const directFreqInput = document.getElementById('directFreq');
+const directFreqSetBtn = document.getElementById('directFreqSet');
+const directFreqHint = document.getElementById('directFreqHint');
+
+const bandsSel = document.getElementById('bands');
+const stepsSel = document.getElementById('steps');
+const bwSel = document.getElementById('bandwidths');
+const customStepInput = document.getElementById('customStep');
+
+const volRange = document.getElementById('volume');
+const volLabel = document.getElementById('volumeValue');
+const squelchRange = document.getElementById('squelch');
+const squelchLabel = document.getElementById('squelchValue');
+const agcRange = document.getElementById('agcAttenuation');
+const agcLabel = document.getElementById('agcAttValue');
+
+const rdsText = document.getElementById('rdsText');
+const piCode = document.getElementById('piCode');
+const stationName = document.getElementById('stationName');
+
+const rssiLabel = document.getElementById('rssiLabel');
+const snrLabel = document.getElementById('snrLabel');
+const smeterBar = document.getElementById('smeterBar');
+
+const ipLabel = document.getElementById('ipLabel');
+const fwLabel = document.getElementById('fwLabel');
+const timeLabel = document.getElementById('timeLabel');
+const batteryLabel = document.getElementById('batteryLabel');
+
+const presetList = document.getElementById('presetList');
+const savePresetBtn = document.getElementById('savePreset');
+const deletePresetBtn = document.getElementById('deletePreset');
+const loadPresetBtn = document.getElementById('loadPreset');
+
+const themeSelect = document.getElementById('themeSelect');
+const langSelect = document.getElementById('langSelect');
+
+
+/* ====== I18N (RO/EN) ====== */
+const I18N = {
+  ro: {
+    theme: "Temă",
+    language: "Limbă",
+    header_mobile: "· MiniATS Control ·",
+    header_desktop: "· MiniATS Control ·",
+    theme_blue: "SDR++ Albastru",
+    theme_red: "SDR++ Roșu",
+    theme_carbon: "Dark Carbon",
+    theme_hackrf: "HackRF Neon",
+    theme_websdr: "WebSDR Clasic",
+    frequency: "Frecvență",
+    frequency_tuning: "Frecvență & Tuning",
+    smeter: "S-Meter",
+    smeter_signal: "S-Meter & Semnal",
+    band_step_bw: "Bandă / Step / BW",
+    audio_agc: "Audio & AGC",
+    rds: "RDS",
+    info: "Info",
+    memories: "Memorii ATS-Mini",
+    band: "Bandă",
+    mode: "Mod",
+    set: "Set",
+    load: "Încărcare",
+    save_current: "Salvează curent",
+    delete: "Șterge",
+    step_from_ats: "Step (din ATS)",
+    seek_step: "Seek step (kHz)",
+    seek_step_hint: "Folosit la Seek (tap/hold). Ex: 1, 5, 10, 50",
+    bandwidth: "Bandwidth",
+    volume_ui: "Volum (din UI)",
+    volume: "Volum",
+    squelch: "Squelch",
+    agc_att: "AGC/Att",
+    station: "Stație",
+    time: "Ora",
+    battery: "Baterie",
+    waiting_rds: "Aștept date RDS...",
+    mb_hint: "Tune ± = 1 kHz · Hold Seek = scan",
+    direct_freq_ph: "Ex: 101.50 (FM) sau 710 (kHz)",
+    direct_freq_hint: "FM: MHz (ex: 101.50) · AM/SSB: kHz (ex: 710)",
+    invalid_format: "Format invalid. Folosește doar cifre și un singur separator . sau ,",
+    invalid_out_of_range: "În afara plajei pentru banda curentă: {min} - {max} {unit}",
+    invalid_generic: "Frecvență invalidă.",
+    off: "Oprit",
+    agc_on: "AGC Pornit",
+    no_rds: "Fără date RDS",
+    online: "Online: {ip}",
+    offline: "Offline?",
+    mem_empty: "[gol]",
+    tune_minus: "Tune - (1 kHz)",
+    tune_plus: "Tune + (1 kHz)",
+    seek_hold: "Tap = seek; Hold = scan continuu",
+    mute_unmute: "Mute / Unmute",
+    tune_hint: "Tune ±: pas fix 1 kHz",
+    tune_minus_btn: "◀ Tune −",
+    tune_plus_btn: "Tune + ▶",
+    seek_down: "Seek ↓",
+    seek_up: "Seek ↑"
+  },
+  en: {
+    theme: "Theme",
+    language: "Language",
+    header_mobile: "· MiniATS Control ·",
+    header_desktop: "· MiniATS Control ·",
+    theme_blue: "SDR++ Blue",
+    theme_red: "SDR++ Red",
+    theme_carbon: "Dark Carbon",
+    theme_hackrf: "HackRF Neon",
+    theme_websdr: "WebSDR Classic",
+    frequency: "Frequency",
+    frequency_tuning: "Frequency & Tuning",
+    smeter: "S-Meter",
+    smeter_signal: "S-Meter & Signal",
+    band_step_bw: "Band / Step / BW",
+    audio_agc: "Audio & AGC",
+    rds: "RDS",
+    info: "Info",
+    memories: "ATS-Mini Memories",
+    band: "Band",
+    mode: "Mode",
+    set: "Set",
+    load: "Load",
+    save_current: "Save current",
+    delete: "Delete",
+    step_from_ats: "Step (from ATS)",
+    seek_step: "Seek step (kHz)",
+    seek_step_hint: "Used for Seek (tap/hold). E.g.: 1, 5, 10, 50",
+    bandwidth: "Bandwidth",
+    volume_ui: "Volume (UI)",
+    volume: "Volume",
+    squelch: "Squelch",
+    agc_att: "AGC/Att",
+    station: "Station",
+    time: "Time",
+    battery: "Battery",
+    waiting_rds: "Waiting for RDS data...",
+    mb_hint: "Tune ± = 1 kHz · Hold Seek = scan",
+    direct_freq_ph: "Ex: 101.50 (FM) or 710 (kHz)",
+    direct_freq_hint: "FM: MHz (e.g. 101.50) · AM/SSB: kHz (e.g. 710)",
+    invalid_format: "Invalid format. Use digits and a single decimal separator . or ,",
+    invalid_out_of_range: "Out of range for current band: {min} - {max} {unit}",
+    invalid_generic: "Invalid frequency.",
+    off: "Off",
+    agc_on: "AGC On",
+    no_rds: "No RDS data",
+    online: "Online: {ip}",
+    offline: "Offline?",
+    mem_empty: "[empty]",
+    tune_minus: "Tune - (1 kHz)",
+    tune_plus: "Tune + (1 kHz)",
+    seek_hold: "Tap = seek; Hold = continuous scan",
+    mute_unmute: "Mute / Unmute",
+    tune_hint: "Tune ±: fixed 1 kHz step",
+    tune_minus_btn: "◀ Tune −",
+    tune_plus_btn: "Tune + ▶",
+    seek_down: "Seek ↓",
+    seek_up: "Seek ↑"
+  }
+};
+
+let currentLang = localStorage.getItem('lang') || 'ro';
+
+function t(key, vars){
+  const dict = I18N[currentLang] || I18N.ro;
+  let s = dict[key] ?? I18N.ro[key] ?? key;
+  if (vars){
+    for (const [k,v] of Object.entries(vars)){
+      s = s.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return s;
+}
+
+function applyI18nToDom(){
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+  });
+
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+  });
+}
+
+function setLanguage(lang){
+  currentLang = (lang === 'en') ? 'en' : 'ro';
+  localStorage.setItem('lang', currentLang);
+  if (langSelect) langSelect.value = currentLang;
+  applyI18nToDom();
+  validateDirectFrequencyUI();
+}
+
+if (langSelect){
+  langSelect.addEventListener('change', ()=> setLanguage(langSelect.value));
+}
+
+/* ====== STATE ====== */
+let statusData = null;
+let optionsData = null;
+let pollTimer = null;
+let lastVolumeBeforeMute = null;
+let isSeeking = false;
+let memorySlots = [];
+
+/* ====== WATERFALL SETUP (simulat) ====== */
+const canvas = document.getElementById('waterfall');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+/* Simulated waterfall line, pe baza RSSI + jitter */
+function drawWaterfallRow(rssi) {
+    const w = canvas.width;
+    const h = canvas.height;
+    if (w === 0 || h === 0) return;
+
+    const imageData = ctx.getImageData(0,0,w,h-1);
+    ctx.putImageData(imageData,0,1);
+
+    let norm = Math.max(-20, Math.min(60, rssi));
+    norm += (Math.random()*6 - 3);
+
+    const t = (norm + 20) / 80;
+    let r,g,b;
+    if (t < 0.33) {
+        const u = t/0.33;
+        r = 0;
+        g = Math.round(255*u);
+        b = 255 - Math.round(155*u);
+    } else if (t < 0.66) {
+        const u = (t-0.33)/0.33;
+        r = Math.round(255*u);
+        g = 255;
+        b = 100 - Math.round(100*u);
+    } else {
+        const u = (t-0.66)/0.34;
+        r = 255;
+        g = 255 - Math.round(255*u);
+        b = 0;
+    }
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(0,0,w,1);
+}
+
+/* S-meter */
+function updateSMeter(rssi,snr) {
+    const norm = Math.max(-20, Math.min(60, rssi));
+    const pct = ((norm + 20) / 80) * 100;
+    smeterBar.style.width = pct.toFixed(1) + '%';
+    rssiLabel.textContent = `${rssi} dBµV`;
+    snrLabel.textContent  = `${snr} dB`;
+}
+
+/* ====== FETCH HELPERS ====== */
+async function getJSON(url) {
+    const resp = await fetch(url, { cache: "no-store" });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return resp.json();
+}
+
+async function postJSON(url, obj) {
+    const resp = await fetch(url, {
+        method:'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(obj)
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    try { return await resp.json(); }
+    catch { return {}; }
+}
+
+/* ====== OPTIONS & INITIAL LOAD ====== */
+async function loadOptions() {
+    optionsData = await getJSON(PROXY_OPTIONS_URL);
+
+    bandsSel.innerHTML = '';
+    for (const b of optionsData.bands) {
+        const mode = optionsData.modes.find(m => m.id === b.modeIdx)?.mode ?? '';
+        const minHz = b.minimumFreq;
+        const maxHz = b.maximumFreq;
+        const isFM = (mode === 'FM');
+        const minStr = isFM ? (minHz/1e6).toFixed(2)+' MHz' : (minHz/1e3).toFixed(0)+' kHz';
+        const maxStr = isFM ? (maxHz/1e6).toFixed(2)+' MHz' : (maxHz/1e3).toFixed(0)+' kHz';
+
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = `${b.name} | ${mode} | ${minStr} - ${maxStr}`;
+        bandsSel.appendChild(opt);
+    }
+}
+
+/* ====== MEMORII ATS-MINI ====== */
+function formatMemoryLabel(mem, index) {
+    const pos = (index + 1).toString().padStart(2, '0');
+    if (!mem || mem.freq === undefined) return `${pos}: ${t('mem_empty')}`;
+
+    const band = optionsData?.bands.find(b => b.id === mem.bandIdx);
+    const modeObj = optionsData?.modes.find(m => m.id === mem.modeIdx);
+    const mode = modeObj?.mode ?? 'FM';
+    const isFM = (mode === 'FM');
+
+    const freqStr = isFM
+        ? (mem.freq / 1e6).toFixed(2) + ' MHz'
+        : (mem.freq / 1e3).toFixed(0) + ' kHz';
+
+    const namePart = mem.name ? mem.name + ' - ' : '';
+    const bandPart = band ? band.name + ' - ' : '';
+
+    return `${pos}: ${namePart}${bandPart}${mode} ${freqStr}`;
+}
+
+async function loadMemoriesFromATS() {
+    if (!optionsData) return;
+
+    try {
+        const list = await getJSON(PROXY_MEM_LIST_URL);
+        memorySlots = Array.isArray(list) ? list : [];
+    } catch {
+        memorySlots = [];
+    }
+
+    presetList.innerHTML = '';
+    memorySlots.forEach((mem, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = formatMemoryLabel(mem, idx);
+        opt.dataset.slotIndex = idx;
+        if (mem && mem.id !== undefined) opt.dataset.id = mem.id;
+        presetList.appendChild(opt);
+    });
+}
+
+savePresetBtn.addEventListener('click', async () => {
+    const opt = presetList.selectedOptions[0];
+    if (!opt) return;
+
+    const slotIndex = parseInt(opt.dataset.slotIndex || opt.value, 10);
+    if (isNaN(slotIndex)) return;
+
+    try {
+        await postJSON(PROXY_MEM_STORE_URL + slotIndex, {});
+        await loadMemoriesFromATS();
+    } catch {}
+});
+
+deletePresetBtn.addEventListener('click', async () => {
+    const opt = presetList.selectedOptions[0];
+    if (!opt) return;
+
+    const id = parseInt(opt.dataset.id ?? opt.dataset.slotIndex ?? opt.value, 10);
+    if (isNaN(id)) return;
+
+    try {
+        await fetch(PROXY_MEM_CLEAR_URL + id, { method: 'DELETE' });
+        await loadMemoriesFromATS();
+    } catch {}
+});
+
+loadPresetBtn.addEventListener('click', async () => {
+    const opt = presetList.selectedOptions[0];
+    if (!opt) return;
+
+    const id = parseInt(opt.dataset.id ?? opt.dataset.slotIndex ?? opt.value, 10);
+    if (isNaN(id)) return;
+
+    try {
+        await postJSON(PROXY_MEM_TUNE_URL + id, {});
+    } catch {}
+});
+
+/* ====== UPDATE UI FROM STATUS ====== */
+function applyStatus(s) {
+    statusData = s;
+
+    const mode = optionsData?.modes.find(m => m.id === s.modeIdx)?.mode ?? 'FM';
+    const isFM = mode === 'FM';
+    const freqHz = s.freq;
+
+    let mainStr, unit;
+    if (isFM) { mainStr = (freqHz/1e6).toFixed(2); unit = 'MHz'; }
+    else { mainStr = (freqHz/1e3).toFixed(0); unit = 'kHz'; }
+
+    freqDisplay.textContent = mainStr;
+    freqUnit.textContent = unit;
+
+    const bandObj = optionsData?.bands.find(b => b.id === s.bandIdx);
+    bandLabel.textContent = bandObj?.name ?? 'N/A';
+    modeLabel.textContent = mode;
+
+    if (bandsSel && bandObj) bandsSel.value = String(bandObj.id);
+
+    if (stepsSel && optionsData) {
+        const stepList = (mode === 'FM') ? optionsData.steps.fm
+                       : (mode === 'AM') ? optionsData.steps.am
+                       : optionsData.steps.ssb;
+        stepsSel.innerHTML = '';
+        for (const st of stepList) {
+            const opt = document.createElement('option');
+            opt.value = st.id;
+            opt.textContent = st.desc;
+            stepsSel.appendChild(opt);
+        }
+        stepsSel.value = String(s.stepIdx);
+    }
+
+    if (bwSel && optionsData) {
+        const bwList = (mode === 'FM') ? optionsData.bandwidths.fm
+                       : (mode === 'AM') ? optionsData.bandwidths.am
+                       : optionsData.bandwidths.ssb;
+        bwSel.innerHTML = '';
+        for (const bw of bwList) {
+            const opt = document.createElement('option');
+            opt.value = bw.id;
+            opt.textContent = bw.desc;
+            bwSel.appendChild(opt);
+        }
+        bwSel.value = String(s.bandwidthIdx);
+    }
+
+    volRange.value = String(s.volume);
+    volLabel.textContent = s.volume.toString().padStart(2,'0');
+
+    squelchRange.value = String(s.squelch);
+    squelchLabel.textContent = s.squelch ? `${s.squelch} dBµV` : t('off');
+
+    if (s.agc) {
+        agcRange.value = '-1';
+        agcLabel.textContent = t('agc_on');
+    } else {
+        const att = s.attenuation ?? 0;
+        agcRange.value = String(att);
+        agcLabel.textContent = String(att).padStart(2,'0') + ' dB';
+    }
+
+    piCode.textContent = s.rds?.piCode ?? 'N/A';
+    stationName.textContent = s.rds?.stationName ?? 'N/A';
+    const rt = s.rds?.radioText || s.rds?.programInfo || t('no_rds');
+    if (rt !== rdsText.textContent) {
+        rdsText.textContent = rt;
+        rdsText.style.animation = 'none';
+        void rdsText.offsetWidth;
+        rdsText.style.animation = 'rdsScroll 16s linear infinite';
+    }
+
+    updateSMeter(s.rssi, s.snr);
+    drawWaterfallRow(s.rssi);
+
+    ipLabel.textContent = s.ip ?? '-';
+    fwLabel.textContent = s.version ?? '-';
+    timeLabel.textContent = s.time ?? '--:--';
+    batteryLabel.textContent = s.battery ? s.battery.toFixed(2)+' V' : '-- V';
+
+    // IMPORTANT: revalideaza input-ul dupa schimbari de banda/mod
+    validateDirectFrequencyUI();
+}
+
+/* ====== POLLING ====== */
+async function pollStatus() {
+    try {
+        const s = await getJSON(PROXY_STATUS_URL);
+        applyStatus(s);
+    } catch {
+    } finally {
+        pollTimer = setTimeout(pollStatus, 1000);
+    }
+}
+
+/* ====== SEND UPDATES ====== */
+function updateStatus(partial) {
+    if (!statusData) return;
+    return postJSON(PROXY_UPDATE_URL, { ...partial }).catch(()=>{});
+}
+
+/* ====== CONTROALE ====== */
+bandsSel.addEventListener('change', () => updateStatus({ bandIdx: parseInt(bandsSel.value,10) }));
+stepsSel.addEventListener('change', () => updateStatus({ stepIdx: parseInt(stepsSel.value,10) }));
+bwSel.addEventListener('change', () => updateStatus({ bandwidthIdx: parseInt(bwSel.value,10) }));
+
+/* Volum */
+let volDebounce;
+volRange.addEventListener('input', () => {
+    const v = parseInt(volRange.value,10);
+    volLabel.textContent = v.toString().padStart(2,'0');
+    if (volDebounce) clearTimeout(volDebounce);
+    volDebounce = setTimeout(() => updateStatus({volume:v}), 200);
+});
+
+/* Squelch */
+let sqDebounce;
+squelchRange.addEventListener('input', () => {
+    const v = parseInt(squelchRange.value,10);
+    squelchLabel.textContent = v ? `${v} dBµV` : t('off');
+    if (sqDebounce) clearTimeout(sqDebounce);
+    sqDebounce = setTimeout(() => updateStatus({squelch:v}), 200);
+});
+
+/* AGC/Att */
+let agcDebounce;
+agcRange.addEventListener('input', () => {
+    const v = parseInt(agcRange.value,10);
+    agcLabel.textContent = (v === -1) ? t('agc_on') : v.toString().padStart(2,'0')+' dB';
+    if (agcDebounce) clearTimeout(agcDebounce);
+    agcDebounce = setTimeout(() => {
+        if (v === -1) updateStatus({agc:true});
+        else updateStatus({attenuation:v, agc:false});
+    }, 200);
+});
+
+/* ====== FRECVENȚĂ DIRECTĂ (numeric-only + highlight rosu) ====== */
+function sanitizeDirectFreq(){
+    let v = directFreqInput.value || '';
+    v = v.replace(/[^0-9.,]/g, '');
+
+    const parts = v.split(/[.,]/);
+    if (parts.length > 2) {
+        v = parts[0] + '.' + parts.slice(1).join('');
+    }
+
+    v = v.replace(/^[.,]+/, '');
+    directFreqInput.value = v;
+}
+
+function getAllowedRangeForCurrent(){
+    if (statusData && optionsData) {
+        const band = optionsData.bands.find(b => b.id === statusData.bandIdx);
+        const mode = optionsData.modes.find(m => m.id === statusData.modeIdx)?.mode ?? 'FM';
+        if (band) {
+            if (mode === 'FM') return { mode, min: band.minimumFreq/1e6, max: band.maximumFreq/1e6, unit:'MHz' };
+            return { mode, min: band.minimumFreq/1e3, max: band.maximumFreq/1e3, unit:'kHz' };
+        }
+        if (mode === 'FM') return { mode, min: 50, max: 120, unit:'MHz' };
+        return { mode, min: 100, max: 30000, unit:'kHz' };
+    }
+    return { mode:null, min:0, max:Infinity, unit:'' };
+}
+
+function parseDirectFreqValue(){
+    let raw = (directFreqInput.value || '').trim();
+    if (!raw) return { ok:false };
+    raw = raw.replace(',', '.');
+    if (!/^\d+(\.\d+)?$/.test(raw)) return { ok:false };
+
+    const val = parseFloat(raw);
+    if (!isFinite(val) || val <= 0) return { ok:false };
+    return { ok:true, value: val };
+}
+
+function setDirectFreqInvalid(isInvalid, msg){
+    if (isInvalid){
+        directFreqInput.classList.add('invalid');
+        directFreqHint.classList.add('danger');
+        directFreqHint.textContent = msg || t('invalid_generic');
+        directFreqSetBtn.disabled = true;
+    } else {
+        directFreqInput.classList.remove('invalid');
+        directFreqHint.classList.remove('danger');
+        directFreqHint.textContent = t('direct_freq_hint');
+        directFreqSetBtn.disabled = false;
+    }
+}
+
+function validateDirectFrequencyUI(){
+    if (!directFreqInput.value.trim()){
+        setDirectFreqInvalid(false);
+        return true;
+    }
+
+    const parsed = parseDirectFreqValue();
+    if (!parsed.ok){
+        setDirectFreqInvalid(true, 'Format invalid. Doar cifre + un singur separator . sau ,');
+        return false;
+    }
+
+    const rng = getAllowedRangeForCurrent();
+    if (!rng.mode){
+        setDirectFreqInvalid(false);
+        return true;
+    }
+
+    if (parsed.value < rng.min || parsed.value > rng.max){
+        const dec = (rng.unit === 'MHz') ? 2 : 0;
+        setDirectFreqInvalid(true, t('invalid_out_of_range',{min:rng.min.toFixed(dec),max:rng.max.toFixed(dec),unit:rng.unit}));
+        return false;
+    }
+
+    setDirectFreqInvalid(false);
+    return true;
+}
+
+directFreqInput.addEventListener('input', () => {
+    sanitizeDirectFreq();
+    validateDirectFrequencyUI();
+});
+directFreqInput.addEventListener('blur', () => {
+    sanitizeDirectFreq();
+    validateDirectFrequencyUI();
+});
+
+function setDirectFrequency() {
+    if (!statusData || !optionsData) return;
+    if (!validateDirectFrequencyUI()) return;
+
+    const parsed = parseDirectFreqValue();
+    if (!parsed.ok) return;
+
+    const rng = getAllowedRangeForCurrent();
+    const mode = rng.mode ?? (optionsData.modes.find(m=>m.id===statusData.modeIdx)?.mode ?? 'FM');
+
+    let freqHz;
+    if (mode === 'FM') freqHz = Math.round(parsed.value * 1e6);
+    else freqHz = Math.round(parsed.value * 1e3);
+
+    updateStatus({freq:freqHz});
+}
+
+directFreqSetBtn.addEventListener('click', setDirectFrequency);
+directFreqInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') setDirectFrequency();
+});
+
+/* ====== TUNING: PAS FIX 1 kHz ====== */
+function tuneStep(direction) {
+    if (!statusData) return;
+    const stepHz = 1000;
+    const newFreq = statusData.freq + stepHz * (direction > 0 ? 1 : -1);
+    updateStatus({ freq:newFreq });
+}
+tuneUpBtn.addEventListener('click', () => tuneStep(+1));
+tuneDownBtn.addEventListener('click', () => tuneStep(-1));
+
+/* ====== MUTE ====== */
+muteBtn.addEventListener('click', () => {
+    if (!statusData) return;
+    if (lastVolumeBeforeMute === null && statusData.volume > 0) {
+        lastVolumeBeforeMute = statusData.volume;
+        volRange.value = '0';
+        volLabel.textContent = '00';
+        updateStatus({volume:0});
+        muteBtn.textContent = '🔊';
+    } else {
+        const restore = lastVolumeBeforeMute ?? 20;
+        volRange.value = String(restore);
+        volLabel.textContent = restore.toString().padStart(2,'0');
+        updateStatus({volume:restore});
+        lastVolumeBeforeMute = null;
+        muteBtn.textContent = '🔇';
+    }
+});
+
+/* ====== SEEK cu STEP CUSTOM (kHz) ====== */
+function getSeekStepHz(mode) {
+    let v = parseFloat((customStepInput?.value ?? '10').toString().replace(',', '.'));
+    if (isNaN(v) || v <= 0) return (mode === 'FM') ? 100000 : 5000;
+    return v * 1000;
+}
+
+async function seek(direction) {
+    if (!statusData || !optionsData || isSeeking) return;
+    isSeeking = true;
+
+    try {
+        let freq = statusData.freq;
+        const mode = optionsData.modes.find(m=>m.id===statusData.modeIdx)?.mode ?? 'FM';
+        const stepHz = getSeekStepHz(mode);
+        const band = optionsData.bands.find(b=>b.id===statusData.bandIdx);
+        const minF = band.minimumFreq;
+        const maxF = band.maximumFreq;
+
+        for (let i = 0; i < 200; i++) {
+            freq += stepHz * (direction > 0 ? 1 : -1);
+            if (freq < minF) freq = maxF;
+            if (freq > maxF) freq = minF;
+
+            await updateStatus({ freq });
+            await new Promise(res => setTimeout(res, 250));
+
+            const s = await getJSON(PROXY_STATUS_URL);
+            if (s.rssi >= 10) break;
+        }
+    } catch {
+    } finally {
+        isSeeking = false;
+    }
+}
+seekUpBtn.addEventListener('click', () => seek(+1));
+seekDownBtn.addEventListener('click', () => seek(-1));
+
+/* Tema */
+function applyTheme(name) {
+    document.body.className = '';
+    switch(name) {
+        case 'red': document.body.classList.add('theme-red'); break;
+        case 'carbon': document.body.classList.add('theme-carbon'); break;
+        case 'hackrf': document.body.classList.add('theme-hackrf'); break;
+        case 'websdr': document.body.classList.add('theme-websdr'); break;
+        default: document.body.className=''; // implicit blue
+    }
+}
+themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+applyTheme('blue');
+
+/* SHORTCUTS */
+document.addEventListener('keydown', (e) => {
+    if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+    if (e.key === 'ArrowRight') tuneStep(+1);
+    if (e.key === 'ArrowLeft')  tuneStep(-1);
+    if (e.key === 'ArrowUp')    seek(+1);
+    if (e.key === 'ArrowDown')  seek(-1);
+    if (e.key === 'm' || e.key === 'M') muteBtn.click();
+});
+
+/* STARTUP */
+(async function init() {
+    setLanguage(currentLang);
+    try { await loadOptions(); } catch {}
+    await loadMemoriesFromATS();
+    setInterval(loadMemoriesFromATS, 5000);
+    pollStatus();
+
+    // validare initiala UI
+    validateDirectFrequencyUI();
+})();
+</script>
+</body>
+</html>

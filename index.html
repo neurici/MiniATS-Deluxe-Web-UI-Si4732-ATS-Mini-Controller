@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MiniATS Deluxe By Gersiu</title>
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="expires" content="0" />
+</head>
+<body>
+<script>
+(function () {
+  // override manual:
+  //   /index.html?mobile  -> mobil.html
+  //   /index.html?desktop -> desktop.html
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('mobile'))  return location.replace('mobil.html');
+  if (qs.has('desktop')) return location.replace('desktop.html');
+
+  const ua = navigator.userAgent || '';
+  const isTouch = (navigator.maxTouchPoints || 0) > 0;
+
+  // detectie "mobil" (UA) + fallback pt device mic
+  const isMobileUA = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop|Mobile/i.test(ua);
+  const isSmallScreen = window.matchMedia && window.matchMedia('(max-width: 900px)').matches;
+
+  const target = (isMobileUA || (isTouch && isSmallScreen)) ? 'mobile.html' : 'desktop.html';
+  location.replace(target);
+})();
+</script>
+
+<noscript>
+  <p style="font-family:system-ui,sans-serif">
+    Enable / Activează JavaScript. Use/ Folosiți: <a href="desktop.html">desktop.html</a> / <a href="mobil.html">mobil.html</a>
+  </p>
+</noscript>
+</body>
+</html>
