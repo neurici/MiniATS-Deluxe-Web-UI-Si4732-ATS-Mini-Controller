@@ -13,7 +13,9 @@ Modern, responsive web interface for controlling **Si4732 ATS-Mini / MiniATS** d
 At this moment, this web interface is **compatible ONLY with the following firmware version**:
 
 - **F/W v2.30d — Aug 22 2025**
-
+- ats-mini.ino.merged.bin - v2.30d
+- To load the new firmware you can use https://espressif.github.io/esptool-js/, after connecting via usb cable, at
+  Flash Address, set 0x0, and select the .bin file (ats-mini.ino.merged.bin), after programing, connect atsmini to your wifi network
 The application relies on:
 - the exact structure of `/api/status`,
 - `/api/statusOptions`,
